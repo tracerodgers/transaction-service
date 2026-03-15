@@ -10,14 +10,19 @@ import java.util.*
     name = "transactions",
     indexes = [
         Index(name = "idx_round_id", columnList = "round_id"),
-        Index(name = "idx_createdAt", columnList = "created_at"),
-        Index(name = "idx_playerId", columnList = "playerId")
+        Index(name = "idx_player_id_created_at", columnList = "player_id, created_at")
     ]
 )
 data class TransactionEntity (
+    /**
+     *  Primary Key
+     */
     @Id
     val transactionId: UUID,
 
+    /**
+     * Version used to enforce optimistic locking
+     */
     @Version
     var version: Long? = null,
 
@@ -47,5 +52,4 @@ data class TransactionEntity (
 
     @Column(nullable = false)
     val updatedAt: Instant
-
 )

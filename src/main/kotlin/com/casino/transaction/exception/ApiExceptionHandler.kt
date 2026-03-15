@@ -8,6 +8,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
+/**
+ * A handler for capturing exceptions and mapping to the appropriate response code / payload.
+ */
 @ControllerAdvice
 class ApiExceptionHandler {
 

@@ -29,6 +29,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("tools.jackson.module:jackson-module-kotlin")
 	implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+	implementation("org.springframework.boot:spring-boot-starter-logging")
 
 	runtimeOnly("com.h2database:h2")
 

@@ -9,6 +9,9 @@ import com.casino.transaction.persistence.TransactionEntity
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
+/**
+ * Validation component responsible for transaction creation and updates.
+ */
 @Component
 class TransactionValidator {
 
@@ -48,7 +51,10 @@ class TransactionValidator {
 
     fun checkResultCreateForExistingWager(allTransactionsForRound: List<TransactionEntity>, newRequest: CreateTransactionRequest) {
         if (allTransactionsForRound.none { it.type == TransactionType.WAGER.name
-                    && it.transactionStatus == TransactionStatus.COMPLETED.name}) {
+                    && it.transactionStatus == TransactionStatus.COMPLETED.name}
+                || (!allTransactionsForRound.all {
+                    it.playerId == newRequest.playerId && it.gameName == newRequest.gameName && it.currency == newRequest.currency.name
+                })) {
 
             throw InvalidTransactionException(
                 "unable to create result transaction: ${newRequest.transactionId}, no successful wager found"
@@ -60,7 +66,7 @@ class TransactionValidator {
         return existing.roundId == newRequest.roundId
                 && existing.playerId == newRequest.playerId
                 && existing.gameName == newRequest.gameName
-                && existing.amount == newRequest.amount
+                && existing.amount.toDouble() == newRequest.amount.toDouble()
                 && existing.type == newRequest.type.name
                 && existing.currency == newRequest.currency.name
     }

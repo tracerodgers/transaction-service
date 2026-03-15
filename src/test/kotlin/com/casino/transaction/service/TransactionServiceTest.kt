@@ -1,7 +1,5 @@
 package com.casino.transaction.service
 
-import com.casino.transaction.api.model.CreateTransactionRequest
-import com.casino.transaction.api.model.CurrencyCode
 import com.casino.transaction.api.model.TransactionResponse
 import com.casino.transaction.api.model.TransactionStatus
 import com.casino.transaction.api.model.TransactionType
@@ -10,36 +8,32 @@ import com.casino.transaction.mappers.TransactionMapper
 import com.casino.transaction.persistence.TransactionEntity
 import com.casino.transaction.persistence.TransactionRepository
 import com.casino.transaction.validation.TransactionValidator
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.runs
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.math.BigDecimal
-import java.util.Optional
-import java.util.UUID
+import org.springframework.core.env.Environment
+import utils.TestUtils.buildCreateTransactionRequest
+import java.util.*
 
 class TransactionServiceTest {
     val repository = mockk<TransactionRepository>(relaxed = true)
     val transactionMapper = mockk<TransactionMapper>(relaxed = true)
     val validator = mockk<TransactionValidator>(relaxed = true)
+    val env = mockk<Environment>(relaxed = true)
 
     private lateinit var service: TransactionService
 
     @BeforeEach
     fun init() {
         clearAllMocks()
-        service = TransactionService(repository, transactionMapper, validator)
+        service = TransactionService(repository, transactionMapper, validator, env)
     }
 
     @Test
     fun testCreateTransactionWager() {
-        val request = getTestTransaction(type = TransactionType.WAGER)
+        val request = buildCreateTransactionRequest(type = TransactionType.WAGER)
         val entity = mockk<TransactionEntity>()
         val response = mockk<TransactionResponse>()
 
@@ -60,7 +54,7 @@ class TransactionServiceTest {
 
     @Test
     fun testCreateTransactionResult() {
-        val request = getTestTransaction(type = TransactionType.RESULT)
+        val request = buildCreateTransactionRequest(type = TransactionType.RESULT)
         val entity = mockk<TransactionEntity>()
         val response = mockk<TransactionResponse>()
         val priorTransactions = mockk<List<TransactionEntity>>()
@@ -111,22 +105,4 @@ class TransactionServiceTest {
 
         assertThrows<TransactionNotFoundException> { service.updateStatus(transactionId, updatedStatus) }
     }
-
-    private fun getTestTransaction(
-        transactionId: UUID = UUID.randomUUID(),
-        roundId: UUID = UUID.randomUUID(),
-        gameName: String = "someGame",
-        playerId: String = "somePlayer",
-        amount: BigDecimal = BigDecimal("1.00"),
-        type: TransactionType = TransactionType.WAGER,
-        currency: CurrencyCode = CurrencyCode.USD
-    ) = CreateTransactionRequest(
-        transactionId = transactionId,
-        roundId = roundId,
-        gameName = gameName,
-        playerId = playerId,
-        amount = amount,
-        type = type,
-        currency = currency
-    )
 }
